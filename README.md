@@ -40,3 +40,19 @@ Usage
   - To delete all existing bounding boxes in the image, simply click `ClearAll`.
 3. After finishing one image, click `Next` to advance. Likewise, click `Prev` to reverse. Or, input an image id and click `Go` to navigate to the speficied image.
   - Be sure to click `Next` after finishing a image, or the result won't be saved. 
+
+
+ProcessImages.workflow is an automator script to do the following in order:
+    - 1. Get the images to work on
+    - 2. Change the type of the images to JPEG format
+    - 3. Change extension of all files to .JPEG (some files will have .jpg and .JPG etc.) because the BBox tool will accept only *.JPEG extension files.
+    - 4. Scale all the images to 320 px in largest side so that Bbox tool will have a neat image to work on and it will be easy for ML training as well.
+    
+
+process.py file is from https://timebutt.github.io/static/how-to-train-yolov2-to-detect-custom-objects/. This file randomly categorizes an image into training or test data based on the percentage configured in the script for testing. The output of this is fed into darknet for training purpose
+
+
+check.py - Jinesh authored this initially. check.py file is needed to see if every image file is properly associated with a text annotation file. The script finally copies only those image files for which it has a corresponding text annotation. Multiple annotation in a single image file and the corresponding image files are moved into a separate folder to keep it clean.
+
+
+Added convert.py from https://github.com/Guanghan/darknet/blob/master/scripts/convert.py with modifications within it. The basic purpose of this script is to convert the BBox label annotation into Yolo format
