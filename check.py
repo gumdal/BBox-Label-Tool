@@ -1,3 +1,5 @@
+#Jinesh authored this initially. check.py file is needed to see if every image file is properly associated with a text annotation file. The script finally copies only those image files for which it has a corresponding text annotation. Multiple annotation in a single image file and the corresponding image files are moved into a separate folder to keep it clean.
+
 import os
 from shutil import copyfile
 labelFolder = "/Labels/004/"

@@ -8,6 +8,8 @@ This script is to convert the txt annotation files to appropriate format needed 
 Email: gnxr9@mail.missouri.edu
 """
 
+#Added convert.py from https://github.com/Guanghan/darknet/blob/master/scripts/convert.py with modifications within it. The basic purpose of this script is to convert the BBox label annotation into Yolo format
+
 import os
 from os import walk, getcwd
 from PIL import Image

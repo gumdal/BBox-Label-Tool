@@ -1,3 +1,5 @@
+#changeClass.py script changes the class index name in all the text files in a folder to the desired index from corresponding *.names file which will be consequently fed in for training
+
 import os
 from shutil import copyfile
 

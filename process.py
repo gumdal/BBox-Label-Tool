@@ -1,3 +1,5 @@
+#process.py file is from https://timebutt.github.io/static/how-to-train-yolov2-to-detect-custom-objects/. This file randomly categorizes an image into training or test data based on the percentage configured in the script for testing. The output of this is fed into darknet for training purpose
+
 import glob, os
 
 # Current directory
