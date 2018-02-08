@@ -40,6 +40,7 @@ class LabelTool():
         self.category = 0
         self.imagename = ''
         self.labelfilename = ''
+        self.yoloLabelFileName = ''
         self.tkimg = None
         self.currentLabelclass = ''
         self.cla_can_temp = []
@@ -54,6 +55,7 @@ class LabelTool():
         self.bboxIdList = []
         self.bboxId = None
         self.bboxList = []
+        self.yoloList = []
         self.hl = None
         self.vl = None
 
@@ -206,6 +208,8 @@ class LabelTool():
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
         labelname = self.imagename + '.txt'
         self.labelfilename = os.path.join(self.outDir, labelname)
+        yoloLabelName = 'yolo/' + self.imagename + '.txt'
+        self.yoloLabelFileName = os.path.join(self.outDir, yoloLabelName)
         bbox_cnt = 0
         if os.path.exists(self.labelfilename):
             with open(self.labelfilename) as f:
@@ -226,14 +230,23 @@ class LabelTool():
                     self.listbox.insert(END, '%s : (%d, %d) -> (%d, %d)' %(tmp[4],int(tmp[0]), int(tmp[1]), \
                     												  int(tmp[2]), int(tmp[3])))
                     self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
+        #Raj:
+        if os.path.exists(self.yoloLabelFileName):
+            with open(self.yoloLabelFileName) as f:
+                for (i, line) in enumerate(f):
+                    tmp = line.split()
+                    self.yoloList.append(tuple(tmp))
 
     def saveImage(self):
         with open(self.labelfilename, 'w') as f:
             f.write('%d\n' %len(self.bboxList))
             for bbox in self.bboxList:
                 f.write(' '.join(map(str, bbox)) + '\n')
+        with open(self.yoloLabelFileName, 'w') as fy:
+            for yoloLine in self.yoloList:
+                print ('Yolo line: ' + yoloLine)
+                fy.write(yoloLine + '\n')
         print 'Image No. %d saved' %(self.cur)
-
 
     def mouseClick(self, event):
         if self.STATE['click'] == 0:
@@ -246,7 +259,31 @@ class LabelTool():
             self.bboxId = None
             self.listbox.insert(END, '%s : (%d, %d) -> (%d, %d)' %(self.currentLabelclass,x1, y1, x2, y2))
             self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
+            
+            #Raj: Code to write the data in Yolo format:
+            w= int(self.img.size[0])
+            h= int(self.img.size[1])
+            b = (float(x1), float(x2), float(y1), float(y2))
+            sizeVar = (w,h)
+            bb = self.convert(sizeVar, b)
+            #Raj: We will add the index of the current class since Yolo training will get this index and match it up in the *.names file for the proper class name
+            currentClassIndex = self.classcandidate['values'].index(self.currentLabelclass)
+            self.yoloList.append(str(currentClassIndex) + " " + " ".join([str(a) for a in bb]))
+            
         self.STATE['click'] = 1 - self.STATE['click']
+
+    def convert(self, sizetuple, box):
+        dw = 1./sizetuple[0]
+        dh = 1./sizetuple[1]
+        x = (box[0] + box[1])/2.0
+        y = (box[2] + box[3])/2.0
+        w = box[1] - box[0]
+        h = box[3] - box[2]
+        x = x*dw
+        w = w*dw
+        y = y*dh
+        h = h*dh
+        return (x,y,w,h)
 
     def mouseMove(self, event):
         self.disp.config(text = 'x: %d, y: %d' %(event.x, event.y))
@@ -280,6 +317,8 @@ class LabelTool():
         self.mainPanel.delete(self.bboxIdList[idx])
         self.bboxIdList.pop(idx)
         self.bboxList.pop(idx)
+        #Raj:
+        self.yoloList.pop(idx)
         self.listbox.delete(idx)
 
     def clearBBox(self):
@@ -288,6 +327,8 @@ class LabelTool():
         self.listbox.delete(0, len(self.bboxList))
         self.bboxIdList = []
         self.bboxList = []
+        #Raj:
+        self.yoloList = []
 
     def prevImage(self, event = None):
         self.saveImage()
