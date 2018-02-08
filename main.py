@@ -16,7 +16,7 @@ import glob
 import random
 
 # colors for the bboxes
-COLORS = ['red', 'blue', 'olive', 'teal', 'cyan', 'green', 'black']
+COLORS = ['red', 'blue', 'green', 'black']
 # image sizes for the examples
 SIZE = 256, 256
 
@@ -197,6 +197,7 @@ class LabelTool():
     def loadImage(self):
         # load image
         imagepath = self.imageList[self.cur - 1]
+        print ('Image loaded: ' + imagepath)
         self.img = Image.open(imagepath)
         self.tkimg = ImageTk.PhotoImage(self.img)
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
@@ -244,8 +245,8 @@ class LabelTool():
                 f.write(' '.join(map(str, bbox)) + '\n')
         with open(self.yoloLabelFileName, 'w') as fy:
             for yoloLine in self.yoloList:
-                print ('Yolo line: ' + yoloLine)
-                fy.write(yoloLine + '\n')
+                print ('Yolo line: ' + str(yoloLine))
+                fy.write(str(yoloLine)+ '\n')
         print 'Image No. %d saved' %(self.cur)
 
     def mouseClick(self, event):
